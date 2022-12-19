@@ -4,55 +4,56 @@ using OpenQA.Selenium.DevTools.V106.Runtime;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
+using sleeniumTest.Pages;
+using System.Collections.Generic;
 
 namespace sleeniumTest
 {
     public class Tests
     {
-        private IWebDriver _driver;
+
+        private static IWebDriver _driver;
+        private static MainPage _mainPage;
 
         [SetUp]
         public void Setup()
         {
-            _driver = new ChromeDriver();
+            var chromeOptions = new ChromeOptions();
+            chromeOptions.AddArgument("headless");
+            _driver = new ChromeDriver(chromeOptions);
+            //_driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined
             _driver.Navigate().GoToUrl("https://magento.softwaretestingboard.com/men.html");
+            _mainPage = new MainPage(_driver);
         }
 
         [Test] 
         public void LogoutUSer_CheckSignInButtonText_isSignIn()
-        {            
-            IWebElement signInButton = _driver.FindElement(By.ClassName("authorization-link"));
-            string actual = signInButton.Text;
-            //_driver.Close();
+        {         
+            string actual = _mainPage.GetSignInButtonText();
             Assert.AreEqual("Sign In", actual);
+        }
+
+        [Test]
+        public void LogoutUSer_CheckCreateAccountTitleText_IsCorrect()
+        {
+            CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
+            string actual = createAccountPage.GetCreateAccountTitle();
+
+            Assert.AreEqual("Create New Customer Account", actual);
         }
 
         [Test]
         public void MainPage_LoginByValidUser_WelcomeMessageIsCorrect()
         {
-            IWebElement signInButton = _driver.FindElement(By.ClassName("authorization-link"));
-            signInButton.Click();
+            var costumerLoginPage =_mainPage.ClickSignInButton();
+            string email = "marcelomascfb22@gmail.com";
+            string password = "Qwerty1234";
+            costumerLoginPage.LogIn(email, password);
 
-            //_driver.Close();
-            IWebElement emailInput = _driver.FindElement(By.Name("login[username]"));
-            IWebElement passwordInput = _driver.FindElement(By.Name("login[password]"));
-            emailInput.SendKeys("marcelomascfb22@gmail.com");
-            passwordInput.SendKeys("Qwerty1234");
-
-            signInButton = _driver.FindElement(By.Id("send2"));
-            signInButton.Click();
-
-            //ExplicitWaiter
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
-            wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.ClassName("logged-in"), "Welcome, Marcelo Carvalho!"));
-            
-            IWebElement welcomeMessage = _driver.FindElement(By.ClassName("logged-in"));
-             
-
-            string actual = welcomeMessage.Text;
+            string actual = _mainPage.GetWelcomeMessage();
 
             Assert.AreEqual("Welcome, Marcelo Carvalho!", actual);
         }
@@ -60,29 +61,17 @@ namespace sleeniumTest
         [Test]
         public void ValidUser_OpenGear_ProductListIsCorrect()
         {
-            IWebElement signInButton = _driver.FindElement(By.ClassName("authorization-link"));
-            signInButton.Click();
+            var costumerLoginPage = _mainPage.ClickSignInButton();
 
-            IWebElement emailInput = _driver.FindElement(By.Name("login[username]"));
-            IWebElement passwordInput = _driver.FindElement(By.Name("login[password]"));
-            emailInput.SendKeys("marcelomascfb22@gmail.com");
-            passwordInput.SendKeys("Qwerty1234");
+            string email = "marcelomascfb22@gmail.com";
+            string password = "Qwerty1234";
+            costumerLoginPage.LogIn(email, password);
 
-            signInButton = _driver.FindElement(By.Id("send2"));
-            signInButton.Click();
+            var productPage = _mainPage.OpenGearNavigationButton();
 
-            IWebElement gearNavigationButton = _driver.FindElement(By.Id("ui-id-6"));
-            gearNavigationButton.Click();
+            productPage.ScrollToProducts();
 
-            Thread.Sleep(TimeSpan.FromSeconds(3));
-
-            IEnumerable<IWebElement> productInfoElements = _driver.FindElements(By.ClassName("product-item-info"));
-            IEnumerable<IWebElement> productInfoNames = productInfoElements.Select(i=> i.FindElement(By.ClassName("product-item-link")));
-
-            Actions action = new Actions(_driver);
-            action.MoveToElement(productInfoElements.First());
-            action.Perform();
-            IEnumerable<string>actual = productInfoNames.Select(i => i.Text);
+            IEnumerable<string> actual = productPage.GetProductInfoNames();
             IEnumerable<string> expected = new[]
             {
                 "Fusion Backpack",
@@ -90,38 +79,20 @@ namespace sleeniumTest
                 "Affirm Water Bottle",
                 "Sprite Yoga Companion Kit"
             };
-            CollectionAssert.AreEqual(expected, actual);   
+
+            CollectionAssert.AreEqual(expected, actual);
         }
 
         [Test]
         public void LogoutUser_AddProductToCart_AlertIsCorrect()
         {
-            IWebElement gearNavigationButton = _driver.FindElement(By.Id("ui-id-6"));
-            gearNavigationButton.Click();
+            ProductPage productPage = _mainPage.OpenGearNavigationButton();
 
-            Thread.Sleep(TimeSpan.FromSeconds(3));
+            productPage.AddFirstProductToCart();
 
-            IEnumerable<IWebElement> productInfoElements = _driver.FindElements(By.ClassName("product-item-info"));
-            
-            IWebElement tagertProduct = productInfoElements.First();
+            var actual = productPage.GetAlertMessage();
 
-            Actions action = new Actions(_driver);
-            action.MoveToElement(tagertProduct);
-            action.Perform();
-
-            IWebElement productAddToCartButton = tagertProduct.FindElement(By.ClassName("tocart"));
-
-            productAddToCartButton.Click();
-            //ExplicitWaiter
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
-            wait.Until(ExpectedConditions.ElementExists(By.ClassName("message-success")));
-
-            IWebElement alert = _driver.FindElement(By.ClassName("message-success"));
-
-            Assert.AreEqual("You added Fusion Backpack to your shopping cart.", alert.Text);
-
-            //Actions action = new Actions(_driver);
-            //action.MoveToElement(productInfoElements.First());
+            Assert.AreEqual("You added Fusion Backpack to your shopping cart.", actual);
         }
         [TearDown]
         public void TearDown()

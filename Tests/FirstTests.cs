@@ -7,9 +7,9 @@ using SeleniumExtras.WaitHelpers;
 using sleeniumTest.Pages;
 using System.Collections.Generic;
 
-namespace sleeniumTest
+namespace sleeniumTest.Tests
 {
-    public class Tests
+    public class FirstTests
     {
 
         private static IWebDriver _driver;
@@ -29,26 +29,17 @@ namespace sleeniumTest
             _mainPage = new MainPage(_driver);
         }
 
-        [Test] 
-        public void LogoutUSer_CheckSignInButtonText_isSignIn()
-        {         
+        [Test]
+        public void LogoutUser_CheckSignInButtonText_isSignIn()
+        {
             string actual = _mainPage.GetSignInButtonText();
             Assert.AreEqual("Sign In", actual);
         }
 
         [Test]
-        public void LogoutUSer_CheckCreateAccountTitleText_IsCorrect()
-        {
-            CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
-            string actual = createAccountPage.GetCreateAccountTitle();
-
-            Assert.AreEqual("Create New Customer Account", actual);
-        }
-
-        [Test]
         public void MainPage_LoginByValidUser_WelcomeMessageIsCorrect()
         {
-            var costumerLoginPage =_mainPage.ClickSignInButton();
+            var costumerLoginPage = _mainPage.ClickSignInButton();
             string email = "marcelomascfb22@gmail.com";
             string password = "Qwerty1234";
             costumerLoginPage.LogIn(email, password);

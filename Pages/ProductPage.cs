@@ -26,26 +26,22 @@ namespace sleeniumTest.Pages
         {
         }
 
-        public void ScrollToProducts()
+        public void ScrollToProduct(IWebElement element)
         {
             Actions actions = new Actions(_driver);
-            actions.ScrollToElement(_productInfoElementCollection.First());
+            actions.ScrollToElement(element);
             actions.Perform();
         }
 
-        public IEnumerable<string> GetProductInfoNames()
+        
+        public IWebElement GetProductInfo(string productName)
         {
-            IEnumerable<IWebElement> productInfoNames = _productInfoElementCollection
-                .Select(i => i.FindElement(_productInfoNames));
-
-            IEnumerable<string> actual = productInfoNames.Select(i => i.Text);
-            return actual;
+            IWebElement element = _productInfoElementCollection.Where(i => i.FindElement(_productInfoNames).Text == productName).First();
+            return element;
         }
 
-        public void AddFirstProductToCart()
+        public void AddProductToCart(IWebElement targetProduct)
         {
-            IWebElement targetProduct = _productInfoElementCollection.First();
-
             Actions actions = new Actions(_driver);
             actions.MoveToElement(targetProduct);
             actions.Perform();
@@ -53,6 +49,9 @@ namespace sleeniumTest.Pages
             IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
             productAddToCartButton.Click();
+
+            //wait untill cart proccess finish
+            GetAlertMessage();
         }
 
         public string GetAlertMessage()
@@ -65,5 +64,33 @@ namespace sleeniumTest.Pages
 
             return alert.Text;
         }
+
+        public void ScrollToProducts()
+        {
+            Actions actions = new Actions(_driver);
+            actions.ScrollToElement(_productInfoElementCollection.First());
+            actions.Perform();
+        }
+        public void AddFirstProductToCart()
+        {
+            IWebElement targetProduct = _productInfoElementCollection.First();
+
+            Actions actions = new Actions(_driver);
+            actions.MoveToElement(targetProduct);
+            actions.Perform();
+
+            IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
+
+            productAddToCartButton.Click();
+        }
+        public IEnumerable<string> GetProductInfoNames()
+        {
+            IEnumerable<IWebElement> productInfoNames = _productInfoElementCollection
+                .Select(i => i.FindElement(_productInfoNames));
+
+            IEnumerable<string> actual = productInfoNames.Select(i => i.Text);
+            return actual;
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using sleeniumTest.Models;
 
 namespace sleeniumTest.Tests.Scenario1
 {
@@ -41,8 +42,22 @@ namespace sleeniumTest.Tests.Scenario1
             //Add to cart 'Dash Digital Watch'
             productPage.AddProductToCart(watch);
             var actual = productPage.GetAlertMessage();
-            _mainPage.ProccedToCheckout();
-
+            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
+            Random rn = new Random();
+            
+            AddressModel address = new AddressModel
+            {
+                FirstName = "Marcelo",
+                LastName = "Carvalhgo",
+                StreetAddress = "Rua de Real",
+                City = "San Antonio",
+                Region = "57",
+                PostalCode = "12345-6789",
+                Country = "US",
+                TelephoneNumeber = rn.Next(9000000, 999999).ToString(),
+        };
+            checkoutPage.InputAddress(address);
+            checkoutPage.AddCheckoutMethod();
             Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
             //Go to checkout
             //Fill address 

@@ -31,7 +31,6 @@ namespace sleeniumTest.Pages
         {
         }
 
-
         public CostumerPage CreateAnAccount(
             string firstName, string lastName, 
             string email, string password, 

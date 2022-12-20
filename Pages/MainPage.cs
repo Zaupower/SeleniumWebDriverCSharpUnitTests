@@ -61,12 +61,13 @@ namespace sleeniumTest.Pages
             return _welcomeMessage.Text;
         }
 
-        public void ProccedToCheckout()
+        public CheckoutPage ProccedToCheckout()
         {
             ClickCartButton();
             WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             waitForButton.Until(ExpectedConditions.ElementToBeClickable(_checkoutButton)).Click();
-            
+
+            return new CheckoutPage(_driver);
 
         }
         public void ClickCartButton()

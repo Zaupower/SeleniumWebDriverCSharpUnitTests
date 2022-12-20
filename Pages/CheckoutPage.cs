@@ -7,6 +7,7 @@ using sleeniumTest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -66,7 +67,9 @@ namespace sleeniumTest.Pages
         {
             //Verify if button.action.action-show-popup exists
             //if true click it 
-          
+            WebDriverWait waitButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            var openAddressButton = waitButton.Until(ExpectedConditions.ElementToBeClickable(_newAddress));
+
             IEnumerable<IWebElement> _newAddrBtn = _driver.FindElements(_newAddress);
             
             if(_newAddrBtn.Count() == 0)
@@ -85,8 +88,10 @@ namespace sleeniumTest.Pages
             }
             else
             {
-                WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
-                waitForButton.Until(ExpectedConditions.ElementToBeClickable(_newAddressButton)).Click();
+                openAddressButton.Click();
+
+                WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
+                wait.Until(ExpectedConditions.ElementExists(By.ClassName("modal-popup")));
                 
                 InputFirstName(address.FirstName);
                 InputLastName(address.LastName);

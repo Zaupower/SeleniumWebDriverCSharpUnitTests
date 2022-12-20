@@ -54,7 +54,7 @@ namespace sleeniumTest.Tests.Scenario1
                 Region = "57",
                 PostalCode = "12345-6789",
                 Country = "US",
-                TelephoneNumeber = rn.Next(9000000, 999999).ToString(),
+                TelephoneNumeber = rn.Next(90000, 999999).ToString(),
         };
             checkoutPage.InputAddress(address);
             checkoutPage.AddCheckoutMethod();

@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
+using sleeniumTest.Models;
 
 namespace sleeniumTest.Pages
 {
@@ -31,16 +32,13 @@ namespace sleeniumTest.Pages
         {
         }
 
-        public CostumerPage CreateAnAccount(
-            string firstName, string lastName, 
-            string email, string password, 
-            string passwordConfirmation)
+        public CostumerPage CreateAnAccount(CreateUserModel userModel)
         {
-            InputFirstName(firstName);
-            InputLastName(lastName);
-            InputEmail(email);
-            InputPassword(password);
-            InputPasswordConfirmation(passwordConfirmation);
+            InputFirstName(userModel.FirstName);
+            InputLastName(userModel.LastName);
+            InputEmail(userModel.Email);
+            InputPassword(userModel.Password);
+            InputPasswordConfirmation(userModel.PasswordConfirmation);
             
             ClickSubmitNewUserButton();
 

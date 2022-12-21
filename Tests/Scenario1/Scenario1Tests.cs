@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using sleeniumTest.Models;
+using sleeniumTest.Helper;
 
 namespace sleeniumTest.Tests.Scenario1
 {
@@ -32,10 +33,17 @@ namespace sleeniumTest.Tests.Scenario1
         [Test]
         public void test1()
         {
+            GenerateRandomUser generateRandomUser = new GenerateRandomUser();
+            CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
+
+            CreateUserModel createUserModel = generateRandomUser.getRandomUser();
+            
+            createAccountPage.CreateAnAccount(createUserModel);
+
             //Open main page
-                CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
+                //CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
             //Login
-            customerLoginPage.LogIn("moderya7@gmail.com", "test_password1");
+                //customerLoginPage.LogIn("t2@gmail.com", "Qwerty1234");
             //click Gear.Wathces
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
             IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");

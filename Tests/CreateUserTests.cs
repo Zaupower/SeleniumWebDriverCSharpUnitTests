@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using sleeniumTest.Helper;
 
 namespace sleeniumTest.Tests.Tests
 {
@@ -40,13 +41,10 @@ namespace sleeniumTest.Tests.Tests
         [Test]
         public void LogoutUser_CreateValidAccount_CreateAccountSuccessMessageIsCorrect()
         {
+            GenerateRandomUser generateRandomUser = new GenerateRandomUser();
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
-            string firstName = "fisrtName_test";
-            string lastName = "lastName_test";
-            string email = "email_test3@gmail.com";
-            string password = "Pasword_1";
-            string passwordConfirmation = password;
-            CostumerPage costumerPage = createAccountPage.CreateAnAccount(firstName,lastName,email, password, passwordConfirmation);
+            
+            CostumerPage costumerPage = createAccountPage.CreateAnAccount(generateRandomUser.getRandomUser());
 
             string actual = costumerPage.GetCreateAccountSuccessMessage();
 

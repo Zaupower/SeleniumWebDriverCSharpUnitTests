@@ -45,6 +45,9 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "table-checkout-shipping-method")]
         private IList<IWebElement> _chechoutShippingMethod;
 
+        [FindsBy(How = How.ClassName, Using = "actions-toolbar")]
+        private IList<IWebElement> _actionToolBar;
+
         private By _shippingMethod = By.CssSelector("td.col.col-method");
 
         private By _newAddress = By.CssSelector("button.action.action-show-popup");
@@ -55,8 +58,8 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.CssSelector, Using = "button.action.primary.action-save-address")]
         private IWebElement _saveAddress;
 
-        private string _texasRegion = "57";
-        private string _USCountry = "US";
+        [FindsBy(How = How.CssSelector, Using = "button.action.primary.checkout")]
+        private IWebElement _saveOrder;
 
         public CheckoutPage(IWebDriver driver) : base(driver)
         {
@@ -65,10 +68,6 @@ namespace sleeniumTest.Pages
         internal void InputAddress
             (AddressModel address)
         {
-            //Verify if button.action.action-show-popup exists
-            //if true click it 
-            //Wait for new address to be clicable
-            //Wait for list of shipping methods to be clickable
 
             WebDriverWait waitShipping = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
@@ -86,8 +85,8 @@ namespace sleeniumTest.Pages
                 InputCountry(address.Country);
                 InputTelephone(address.TelephoneNumeber);
 
-                AddCheckoutMethod();
-                _nextPage.Click();
+                //AddShippingMethod();
+                //_nextPage.Click();
             }
             else
             {
@@ -95,6 +94,7 @@ namespace sleeniumTest.Pages
                 var openAddressButton = waitButton.Until(ExpectedConditions.ElementToBeClickable(_newAddress));
                 openAddressButton.Click();
                 
+                //Wait for popup address to exist
                 WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
                 wait.Until(ExpectedConditions.ElementExists(By.ClassName("modal-popup")));
                 
@@ -109,13 +109,33 @@ namespace sleeniumTest.Pages
                 //Close addr page
                 _saveAddress.Click();
                 //wait for shipping methods
-                AddCheckoutMethod();
-                _nextPage.Click();
+                //AddShippingMethod();
+                //_nextPage.Click();
             }
 
 
             //else
 
+        }
+
+        public void ClickNextPage()
+        {
+            _nextPage.Click();
+        }
+        public void ClickSaveOrder()
+        {
+            //Note, sometimes is needed that all elements from the page are fully loaded
+            //wait until all page is loaded
+                WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("opc-sidebar")));
+
+                WebDriverWait wait3 = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+                wait3.Until(ExpectedConditions.ElementIsVisible(By.ClassName("payment-method-content")));
+
+            WebDriverWait wait2 = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            var bCheckout = wait2.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("button.action.primary.checkout")));
+
+            _saveOrder.Click();
         }
         public void InputFirstName(string firstName)
         {
@@ -155,13 +175,8 @@ namespace sleeniumTest.Pages
             _telephoneInput.SendKeys(telephoneNumber);
         }
 
-        internal void AddCheckoutMethod()
+        internal void AddShippingMethod()
         {
-            WebDriverWait waitShipping = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
-
-
-
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
             wait.Until((_) => _chechoutShippingMethod.Select(i => i.FindElements(_shippingMethod).Count() > 0));
 

@@ -15,6 +15,7 @@ namespace sleeniumTest.Tests.Scenario1
     {
         private static IWebDriver _driver;
         private static MainPage _mainPage;
+        private CreateUserModel _userModel;
 
         [SetUp]
         public void Setup()
@@ -28,26 +29,28 @@ namespace sleeniumTest.Tests.Scenario1
                                                                                //need time to load, it trys every 50ms until time defined
             _driver.Navigate().GoToUrl("https://magento.softwaretestingboard.com/men.html");
             _mainPage = new MainPage(_driver);
-        }
 
-        [Test]
-        public void test1()
+            //SetUp user
+
+        }
+        [OneTimeSetUp]
+
+        public void OneTimeSetup()
         {
             GenerateRandomUser generateRandomUser = new GenerateRandomUser();
+            _userModel = generateRandomUser.getRandomUser();
+        }
+
+        [Test, Order(1)]
+        public void test1_NewUser()
+        {
+            
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
 
-            CreateUserModel createUserModel = generateRandomUser.getRandomUser();
-            
-            createAccountPage.CreateAnAccount(createUserModel);
+            createAccountPage.CreateAnAccount(_userModel);
 
-            //Open main page
-                //CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
-            //Login
-                //customerLoginPage.LogIn("t2@gmail.com", "Qwerty1234");
-            //click Gear.Wathces
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
             IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
-            //Add to cart 'Dash Digital Watch'
             productPage.AddProductToCart(watch);
             var actual = productPage.GetAlertMessage();
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
@@ -63,18 +66,43 @@ namespace sleeniumTest.Tests.Scenario1
                 PostalCode = "12345-6789",
                 Country = "US",
                 TelephoneNumeber = rn.Next(90000, 999999).ToString(),
-        };
+            };
             checkoutPage.InputAddress(address);
-            checkoutPage.AddCheckoutMethod();
+            checkoutPage.AddShippingMethod();
+            checkoutPage.ClickNextPage();
+            checkoutPage.ClickSaveOrder();
             Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
-            //Go to checkout
-            //Fill address 
-            //Place Order
-            //Get order number
-            //Open 'My Account' page
-            //Open 'My Orders'
-            //Go to my orders, find the placed order and click View Order
-            //Check all order details are correct
+            
+        }
+
+        [Test, Order(2)]
+        public void test1_AlreadyCreatedUser()
+        {
+            CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
+            customerLoginPage.LogIn(_userModel.Email, _userModel.Password);
+            ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
+            IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
+            productPage.AddProductToCart(watch);
+            var actual = productPage.GetAlertMessage();
+            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
+            Random rn = new Random();
+
+            AddressModel address = new AddressModel
+            {
+                FirstName = "Marcelo",
+                LastName = "Carvalhgo",
+                StreetAddress = "Rua de Real",
+                City = "San Antonio",
+                Region = "57",
+                PostalCode = "12345-6789",
+                Country = "US",
+                TelephoneNumeber = rn.Next(90000, 999999).ToString(),
+            };
+            checkoutPage.InputAddress(address);
+            checkoutPage.AddShippingMethod();
+            checkoutPage.ClickNextPage();
+            checkoutPage.ClickSaveOrder();
+            Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
         }
 
         [TearDown]

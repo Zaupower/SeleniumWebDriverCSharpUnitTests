@@ -10,6 +10,7 @@ using sleeniumTest.Models;
 using sleeniumTest.Helper;
 using System.Globalization;
 using NUnit.Framework.Internal;
+using Newtonsoft.Json;
 
 namespace sleeniumTest.Tests.Scenario1
 {
@@ -46,6 +47,12 @@ namespace sleeniumTest.Tests.Scenario1
         [Test, Order(1)]
         public void test1_NewUser()
         {
+            Product dashDigitalWatch = new Product{ ProductName = "Dash Digital Watch"};
+            Product clamberlWatch = new Product{ProductName = "Clamber Watch"};
+            List<Product> productList = new List<Product>();
+            productList.Add(dashDigitalWatch);
+            productList.Add(clamberlWatch);
+
             List<decimal> expectedTotalPrice = new List<decimal>();
 
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
@@ -53,30 +60,53 @@ namespace sleeniumTest.Tests.Scenario1
             createAccountPage.CreateAnAccount(_userModel);
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
-            string watchPrice = productPage.AddProductToCart("Dash Digital Watch");
-            string secondWatchPrice = productPage.AddProductToCart("Clamber Watch");
+            foreach(var product in productList)
+            {
+                string productPrice = productPage.AddProductToCart(product.ProductName);
+                expectedTotalPrice.Add(Parser.CurrencyStringToDecimal(productPrice));
 
+            }
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
             
             checkoutPage.InputAddress(GenerateAddress.GetAddress());
             string shippingPrice = checkoutPage.AddShippingMethod();
-            
+            decimal shipping = Parser.CurrencyStringToDecimal(shippingPrice);
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
+
             string orderNumber = checkoutPage.GetOrderNumber();
 
             checkoutPage.ClickContinueShopping();
             CostumerPage costumerPage = _mainPage.ClickMyAccountButton();
             costumerPage.ClickMyOrders();
-            costumerPage.GetMyOrdersIds();
             OrderDetailsPage orderPage =  costumerPage.ClickOrder(orderNumber);
-            OrderDetails orderDetails = orderPage.GetOrderDetails();
-            
-            decimal number = Parser.CurrencyStringToDecimal(watchPrice);
-            Console.WriteLine(number);
-            //double.Parse(watchPrice, NumberStyles.Currency);
+
+
+            OrderDetails expectedOrder = new OrderDetails
+            {
+                 Products = productList,
+                 GrandTotal = expectedTotalPrice.Sum() + shipping,
+                 ShippingAndHandling = shipping,
+                 SubTotal = expectedTotalPrice.Sum(),
+
+            };
+            OrderDetails actualOrder = orderPage.GetOrderDetails();
+
+            var expectedJson = JsonConvert.SerializeObject(expectedOrder);
+            var actualJson = JsonConvert.SerializeObject(actualOrder);
+
+            Assert.AreEqual(expectedJson, actualJson);
         }
 
+
+
+        public static void AreEqualByJson(object expected, object actual)
+        {
+            
+            var expectedJson = JsonConvert.SerializeObject(expected);
+            var actualJson = JsonConvert.SerializeObject(actual);
+            Assert.AreEqual(expectedJson, actualJson);
+        }
         [Test, Order(2)]
         public void test1_AlreadyCreatedUser()
         {
@@ -109,7 +139,7 @@ namespace sleeniumTest.Tests.Scenario1
         [TearDown]
         public void TearDown()
         {
-            //_driver.Quit();
+            _driver.Quit();
         }
     }
 }

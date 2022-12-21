@@ -40,14 +40,18 @@ namespace sleeniumTest.Pages
             return element;
         }
 
-        public string AddProductToCart(IWebElement targetProduct)
+        public string AddProductToCart(string product)
         {
+            IWebElement targetProduct = GetProductInfo(product);
+
             Actions actions = new Actions(_driver);
             actions.MoveToElement(targetProduct);
             actions.Perform();
 
             IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
+            
             string itemPrice = targetProduct.FindElement(By.ClassName("price")).Text;
+
             productAddToCartButton.Click();
 
             //wait untill cart proccess finish

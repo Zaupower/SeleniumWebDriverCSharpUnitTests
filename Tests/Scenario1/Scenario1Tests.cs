@@ -46,34 +46,19 @@ namespace sleeniumTest.Tests.Scenario1
         [Test, Order(1)]
         public void test1_NewUser()
         {
-            List<double> expectedPrice = new List<double>();
+            List<decimal> expectedTotalPrice = new List<decimal>();
 
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
 
             createAccountPage.CreateAnAccount(_userModel);
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
-            IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
-            IWebElement watch2 = productPage.GetProductInfo("Clamber Watch");
-            string watchPrice = productPage.AddProductToCart(watch);
-
-            productPage.AddProductToCart(watch2);
+            string watchPrice = productPage.AddProductToCart("Dash Digital Watch");
+            string secondWatchPrice = productPage.AddProductToCart("Clamber Watch");
 
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
-            Random rn = new Random();
             
-            AddressModel address = new AddressModel
-            {
-                FirstName = "Marcelo",
-                LastName = "Carvalhgo",
-                StreetAddress = "Rua de Real",
-                City = "San Antonio",
-                Region = "57",
-                PostalCode = "12345-6789",
-                Country = "US",
-                TelephoneNumeber = rn.Next(90000, 999999).ToString(),
-            };
-            checkoutPage.InputAddress(address);
+            checkoutPage.InputAddress(GenerateAddress.GetAddress());
             string shippingPrice = checkoutPage.AddShippingMethod();
             
             checkoutPage.ClickNextPage();
@@ -98,8 +83,7 @@ namespace sleeniumTest.Tests.Scenario1
             CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
             customerLoginPage.LogIn(_userModel.Email, _userModel.Password);
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
-            IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
-            productPage.AddProductToCart(watch);
+            productPage.AddProductToCart("Dash Digital Watch");
             var actual = productPage.GetAlertMessage();
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
             Random rn = new Random();

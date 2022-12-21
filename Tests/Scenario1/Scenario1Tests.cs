@@ -25,7 +25,7 @@ namespace sleeniumTest.Tests.Scenario1
             //_driver = new ChromeDriver(chromeOptions);
             _driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
-            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);//Used to retry get elements in cases where the page/objet
+            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined
             _driver.Navigate().GoToUrl("https://magento.softwaretestingboard.com/men.html");
             _mainPage = new MainPage(_driver);
@@ -71,6 +71,8 @@ namespace sleeniumTest.Tests.Scenario1
             checkoutPage.AddShippingMethod();
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
+            string ordernumber = checkoutPage.GetOrderNumber();
+            Console.WriteLine(ordernumber);
             Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
             
         }

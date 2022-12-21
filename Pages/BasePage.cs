@@ -53,5 +53,12 @@ namespace sleeniumTest.Pages
 
             return new ProductPage(_driver);
         }
+
+        public void ScrollToElement(IWebElement element)
+        {
+            Actions actions = new Actions(_driver);
+            actions.ScrollToElement(element);
+            actions.Perform();
+        }
     }
 }

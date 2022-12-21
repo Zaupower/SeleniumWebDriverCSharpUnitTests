@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace sleeniumTest.Pages
 {
@@ -61,11 +62,12 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.CssSelector, Using = "button.action.primary.checkout")]
         private IWebElement _saveOrder;
 
+        [FindsBy(How = How.ClassName, Using = "checkout-success")]
+        private IList<IWebElement> _checkOutSuccess;
         public CheckoutPage(IWebDriver driver) : base(driver)
         {
-        }
-            
-        internal void InputAddress
+        } 
+        public void InputAddress
             (AddressModel address)
         {
 
@@ -122,20 +124,31 @@ namespace sleeniumTest.Pages
         {
             _nextPage.Click();
         }
+        public string GetOrderNumber()
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.ClassName("checkout-success")));
+
+            IEnumerable<IWebElement> checkoutMethods = _checkOutSuccess
+                .Select(i => i.FindElement(By.TagName("strong")));
+            IWebElement rr = checkoutMethods.First();
+
+            string fr = rr.Text;
+
+            Console.WriteLine(fr);
+            return rr.ToString();
+        }
         public void ClickSaveOrder()
         {
-            //Note, sometimes is needed that all elements from the page are fully loaded
-            //wait until all page is loaded
-                WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("opc-sidebar")));
-
-                WebDriverWait wait3 = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-                wait3.Until(ExpectedConditions.ElementIsVisible(By.ClassName("payment-method-content")));
+            WebDriverWait wait5 = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait5.Until(ExpectedConditions.ElementIsVisible(By.ClassName("billing-address-details")));
 
             WebDriverWait wait2 = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             var bCheckout = wait2.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("button.action.primary.checkout")));
-
-            _saveOrder.Click();
+            
+            ScrollToElement(bCheckout);
+            
+            bCheckout.Click();
         }
         public void InputFirstName(string firstName)
         {

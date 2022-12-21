@@ -3,6 +3,7 @@ using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
 using SeleniumExtras.WaitHelpers;
 using System;
+using System.Xml.Linq;
 
 namespace sleeniumTest.Pages
 {
@@ -66,12 +67,13 @@ namespace sleeniumTest.Pages
             ClickCartButton();
             WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             waitForButton.Until(ExpectedConditions.ElementToBeClickable(_checkoutButton)).Click();
-
+            
             return new CheckoutPage(_driver);
 
         }
         public void ClickCartButton()
         {
+            ScrollToElement(_cartButton);
             _cartButton.Click();
 
         }

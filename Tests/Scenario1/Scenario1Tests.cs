@@ -51,7 +51,9 @@ namespace sleeniumTest.Tests.Scenario1
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
             IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
+            IWebElement watch2 = productPage.GetProductInfo("Clamber Watch");
             productPage.AddProductToCart(watch);
+            productPage.AddProductToCart(watch2);
             var actual = productPage.GetAlertMessage();
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
             Random rn = new Random();
@@ -71,10 +73,16 @@ namespace sleeniumTest.Tests.Scenario1
             checkoutPage.AddShippingMethod();
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
-            string ordernumber = checkoutPage.GetOrderNumber();
+            string orderNumber = checkoutPage.GetOrderNumber();
 
             checkoutPage.ClickContinueShopping();
-            Console.WriteLine(ordernumber);
+            CostumerPage costumerPage = _mainPage.ClickMyAccountButton();
+            costumerPage.ClickMyOrders();
+            //List<string> ordersIds = 
+            costumerPage.GetMyOrdersIds();
+            costumerPage.ClickOrder(orderNumber);
+            //Console.WriteLine("Order Sizes: "+ordersIds.Count());
+            //Console.WriteLine(ordersIds.ToString());
 
             Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
             

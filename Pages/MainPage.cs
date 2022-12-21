@@ -30,7 +30,8 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "messages")]
         private IWebElement _alertMessage;
 
-
+        [FindsBy(How = How.CssSelector, Using = "button.action.switch")]
+        private IWebElement _dropdownSwitchButton;
 
         public MainPage(IWebDriver driver) : base(driver)
         {
@@ -93,6 +94,19 @@ namespace sleeniumTest.Pages
             IWebElement alert = _alertMessage;
 
             return alert.Text;
+        }
+
+        internal CostumerPage ClickMyAccountButton()
+        {
+
+            _dropdownSwitchButton.Click();
+            WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            IWebElement dropdown = waitForButton.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("ul.header.links")));
+            IWebElement myAccountButton = dropdown.FindElement(By.LinkText("My Account"));
+            myAccountButton.Click();
+            //Get element my acc
+
+            return new CostumerPage(_driver);
         }
     }
 }

@@ -8,10 +8,10 @@ namespace sleeniumTest.Models
 {
     public class OrderDetails
     {
-        IEnumerable<Product> products { get; set; }
-        public string SubTotal { get; set; }
-        public string ShippingAndHandling { get; set; }
-        public string GrandTotal { get; set; }
+        public IEnumerable<Product> Products { get; set; }
+        public decimal SubTotal { get; set; }
+        public decimal ShippingAndHandling { get; set; }
+        public decimal GrandTotal { get; set; }
 
     }
 }

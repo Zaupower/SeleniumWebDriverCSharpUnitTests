@@ -83,14 +83,9 @@ namespace sleeniumTest.Tests.Scenario1
             checkoutPage.ClickContinueShopping();
             CostumerPage costumerPage = _mainPage.ClickMyAccountButton();
             costumerPage.ClickMyOrders();
-            //List<string> ordersIds = 
             costumerPage.GetMyOrdersIds();
             OrderDetailsPage orderPage =  costumerPage.ClickOrder(orderNumber);
-            orderPage.GetOrderDetails();
-            //Console.WriteLine("Order Sizes: "+ordersIds.Count());
-            //Console.WriteLine(ordersIds.ToString());
-
-            //Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
+            OrderDetails orderDetails = orderPage.GetOrderDetails();
             
             decimal number = Parser.CurrencyStringToDecimal(watchPrice);
             Console.WriteLine(number);

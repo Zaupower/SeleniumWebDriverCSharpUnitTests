@@ -70,7 +70,8 @@ namespace sleeniumTest.Tests.Scenario1
                 TelephoneNumeber = rn.Next(90000, 999999).ToString(),
             };
             checkoutPage.InputAddress(address);
-            checkoutPage.AddShippingMethod();
+            string shippingPrice = checkoutPage.AddShippingMethod();
+            
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
             string orderNumber = checkoutPage.GetOrderNumber();

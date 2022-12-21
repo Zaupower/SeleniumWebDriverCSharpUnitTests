@@ -189,15 +189,17 @@ namespace sleeniumTest.Pages
             _telephoneInput.SendKeys(telephoneNumber);
         }
 
-        internal void AddShippingMethod()
+        internal string AddShippingMethod()
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
             wait.Until((_) => _chechoutShippingMethod.Select(i => i.FindElements(_shippingMethod).Count() > 0));
 
-            IEnumerable<IWebElement> checkoutMethods = _chechoutShippingMethod
-                .Select(i => i.FindElement(_shippingMethod));
+            IEnumerable<IWebElement> checkoutMethods = _chechoutShippingMethod.Select(i => i);
+            var shipingSelected = checkoutMethods.First();
 
-            checkoutMethods.First().Click();
+            string shippingPrice = shipingSelected.FindElement(By.ClassName("price")).Text;
+            shipingSelected.FindElement(_shippingMethod).Click();
+            return shippingPrice;
         }
 
         internal void ClickContinueShopping()

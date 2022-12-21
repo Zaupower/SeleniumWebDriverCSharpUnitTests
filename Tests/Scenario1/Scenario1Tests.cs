@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using sleeniumTest.Models;
 using sleeniumTest.Helper;
+using System.Globalization;
+using NUnit.Framework.Internal;
 
 namespace sleeniumTest.Tests.Scenario1
 {
@@ -44,7 +46,8 @@ namespace sleeniumTest.Tests.Scenario1
         [Test, Order(1)]
         public void test1_NewUser()
         {
-            
+            List<double> expectedPrice = new List<double>();
+
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
 
             createAccountPage.CreateAnAccount(_userModel);
@@ -52,9 +55,10 @@ namespace sleeniumTest.Tests.Scenario1
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
             IWebElement watch = productPage.GetProductInfo("Dash Digital Watch");
             IWebElement watch2 = productPage.GetProductInfo("Clamber Watch");
-            productPage.AddProductToCart(watch);
+            string watchPrice = productPage.AddProductToCart(watch);
+
             productPage.AddProductToCart(watch2);
-            var actual = productPage.GetAlertMessage();
+
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
             Random rn = new Random();
             
@@ -81,12 +85,16 @@ namespace sleeniumTest.Tests.Scenario1
             costumerPage.ClickMyOrders();
             //List<string> ordersIds = 
             costumerPage.GetMyOrdersIds();
-            costumerPage.ClickOrder(orderNumber);
+            OrderDetailsPage orderPage =  costumerPage.ClickOrder(orderNumber);
+            orderPage.GetOrderDetails();
             //Console.WriteLine("Order Sizes: "+ordersIds.Count());
             //Console.WriteLine(ordersIds.ToString());
 
-            Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
+            //Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
             
+            decimal number = Parser.CurrencyStringToDecimal(watchPrice);
+            Console.WriteLine(number);
+            //double.Parse(watchPrice, NumberStyles.Currency);
         }
 
         [Test, Order(2)]

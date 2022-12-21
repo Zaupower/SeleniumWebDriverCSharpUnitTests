@@ -44,6 +44,7 @@ namespace sleeniumTest.Pages
 
             List<IWebElement> orders = _myOrdersTable.FindElements(By.TagName("tr")).ToList();
             Console.WriteLine("Orders count: "+orders.Count());
+            
             //Remove first item, it is description of table
             orders.RemoveAt(0);
 
@@ -52,7 +53,7 @@ namespace sleeniumTest.Pages
             return ordersIds;
         }
 
-        public void ClickOrder(string orderId)
+        public OrderDetailsPage ClickOrder(string orderId)
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             wait.Until(ExpectedConditions.ElementIsVisible(By.Id("my-orders-table")));
@@ -66,6 +67,8 @@ namespace sleeniumTest.Pages
                 .Select(i => i.FindElement(By.LinkText("View Order")));
 
             clickOrder.First().Click();
+
+            return new OrderDetailsPage(_driver);
             
         }
 

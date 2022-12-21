@@ -64,6 +64,10 @@ namespace sleeniumTest.Pages
 
         [FindsBy(How = How.ClassName, Using = "checkout-success")]
         private IList<IWebElement> _checkOutSuccess;
+
+        [FindsBy(How = How.CssSelector, Using = "a.action.primary.continue")]
+        private IWebElement _continueShoppingButton;
+
         public CheckoutPage(IWebDriver driver) : base(driver)
         {
         } 
@@ -131,12 +135,9 @@ namespace sleeniumTest.Pages
 
             IEnumerable<IWebElement> checkoutMethods = _checkOutSuccess
                 .Select(i => i.FindElement(By.TagName("strong")));
-            IWebElement rr = checkoutMethods.First();
+            IWebElement orderId = checkoutMethods.First();
 
-            string fr = rr.Text;
-
-            Console.WriteLine(fr);
-            return rr.ToString();
+            return orderId.Text;
         }
         public void ClickSaveOrder()
         {
@@ -197,6 +198,13 @@ namespace sleeniumTest.Pages
                 .Select(i => i.FindElement(_shippingMethod));
 
             checkoutMethods.First().Click();
+        }
+
+        internal void ClickContinueShopping()
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementToBeClickable(_continueShoppingButton)).Click();
+
         }
     }
 }

@@ -72,7 +72,10 @@ namespace sleeniumTest.Tests.Scenario1
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
             string ordernumber = checkoutPage.GetOrderNumber();
+
+            checkoutPage.ClickContinueShopping();
             Console.WriteLine(ordernumber);
+
             Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
             
         }

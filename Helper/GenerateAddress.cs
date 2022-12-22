@@ -13,7 +13,7 @@ namespace sleeniumTest.Helper
         private static AddressModel model = new AddressModel
         {
             FirstName = "Marcelo",
-            LastName = "Carvalhgo",
+            LastName = "Carvalho",
             StreetAddress = "Rua de Real",
             City = "San Antonio",
             Region = "57",

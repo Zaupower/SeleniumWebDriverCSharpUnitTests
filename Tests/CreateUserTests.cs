@@ -41,10 +41,9 @@ namespace sleeniumTest.Tests.Tests
         [Test]
         public void LogoutUser_CreateValidAccount_CreateAccountSuccessMessageIsCorrect()
         {
-            GenerateRandomUser generateRandomUser = new GenerateRandomUser();
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
             
-            CostumerPage costumerPage = createAccountPage.CreateAnAccount(generateRandomUser.getRandomUser());
+            CostumerPage costumerPage = createAccountPage.CreateAnAccount(GenerateRandomUser.GetNewUser());
 
             string actual = costumerPage.GetCreateAccountSuccessMessage();
 

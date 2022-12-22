@@ -192,35 +192,22 @@ namespace sleeniumTest.Pages
 
         public string AddShippingMethod()
         {
-            
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("checkout-shipping-method-load")));
 
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
-
-            var testShipsMEthdsHead = _driver.FindElement(By.ClassName("table-checkout-shipping-method"));
-
-            ScrollToElement(testShipsMEthdsHead);
-
-            var shipdBody = testShipsMEthdsHead.FindElement(By.TagName("tbody"));
-
-            var shipsMethods = shipdBody.FindElements(By.TagName("tr"));
-
-            //wait.Until((shipsMethods) => shipsMethods.First().FindElement(By.CssSelector(".col.col-price")));
+            var shipsMethods = GetShippingMethods(wait);
 
             string firstShipMethodPrice = shipsMethods.First().FindElement(By.CssSelector(".col.col-price")).Text;
 
             Console.WriteLine("firstShipMethodPrice: " + firstShipMethodPrice);
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
-
-            testShipsMEthdsHead = _driver.FindElement(By.ClassName("table-checkout-shipping-method"));
-
-            ScrollToElement(testShipsMEthdsHead);
-
-            shipdBody = testShipsMEthdsHead.FindElement(By.TagName("tbody"));
-
-            shipsMethods = shipdBody.FindElements(By.TagName("tr"));
-            shipsMethods.First().FindElement(By.CssSelector(".col.col-method")).Click();
+            
+            bool staleness = wait.Until(ExpectedConditions.StalenessOf(shipsMethods.First().FindElement(By.CssSelector(".col.col-method"))));
+            if (staleness)
+            {
+                shipsMethods = GetShippingMethods(wait);
+                firstShipMethodPrice = shipsMethods.First().FindElement(By.CssSelector(".col.col-price")).Text;
+            }
+            var selectShippimentButton = shipsMethods.First().FindElement(By.CssSelector(".col.col-method"));
+            selectShippimentButton.Click();
             return firstShipMethodPrice;
         }
 
@@ -229,6 +216,19 @@ namespace sleeniumTest.Pages
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
             wait.Until(ExpectedConditions.ElementToBeClickable(_continueShoppingButton)).Click();
 
+        }
+
+        private IEnumerable<IWebElement> GetShippingMethods(WebDriverWait wait)
+        {
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
+
+            var shippingMethodHead = _driver.FindElement(By.ClassName("table-checkout-shipping-method"));
+
+            ScrollToElement(shippingMethodHead);
+
+            var shippingdBody = shippingMethodHead.FindElement(By.TagName("tbody"));
+
+            return shippingdBody.FindElements(By.TagName("tr"));
         }
     }
 }

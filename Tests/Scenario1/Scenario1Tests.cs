@@ -40,11 +40,10 @@ namespace sleeniumTest.Tests.Scenario1
 
         public void OneTimeSetup()
         {
-            GenerateRandomUser generateRandomUser = new GenerateRandomUser();
-            _userModel = generateRandomUser.getRandomUser();
+            _userModel = GenerateRandomUser.GetNewUser();
         }
 
-        [Test, Order(1)]
+        [Test]
         public void test1_NewUser()
         {
             Product dashDigitalWatch = new Product{ ProductName = "Dash Digital Watch"};
@@ -97,19 +96,10 @@ namespace sleeniumTest.Tests.Scenario1
 
             var expectedJson = JsonConvert.SerializeObject(expectedOrder);
             var actualJson = JsonConvert.SerializeObject(actualOrder);
-
-            Assert.That(expectedJson, Is.EqualTo(actualJson));
-        }
-
-
-
-        public static void AreEqualByJson(object expected, object actual)
-        {
-            
-            var expectedJson = JsonConvert.SerializeObject(expected);
-            var actualJson = JsonConvert.SerializeObject(actual);
             Assert.AreEqual(expectedJson, actualJson);
         }
+
+        
 
         [Test, Order(2)]
         public void test1_AlreadyCreatedUser()
@@ -123,8 +113,10 @@ namespace sleeniumTest.Tests.Scenario1
             List<decimal> expectedTotalPrice = new List<decimal>();
 
             var costumerLoginPage = _mainPage.ClickSignInButton();
-            
-            costumerLoginPage.LogIn(_userModel.Email, _userModel.Password);
+
+            CreateUserModel registeredUser = GenerateRandomUser.GetRegisteredUser();
+
+            costumerLoginPage.LogIn(registeredUser.Email, registeredUser.Password);
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
 
@@ -172,7 +164,7 @@ namespace sleeniumTest.Tests.Scenario1
         [TearDown]
         public void TearDown()
         {
-            //_driver.Quit();
+            _driver.Quit();
         }
     }
 }

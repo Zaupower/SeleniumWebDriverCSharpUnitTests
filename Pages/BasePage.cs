@@ -20,6 +20,18 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.Id, Using = "ui-id-27")]
         private IWebElement _watchesCategoryButton;
 
+        [FindsBy(How = How.ClassName, Using = "messages")]
+        private IWebElement _alertMessage;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action.switch")]
+        private IWebElement _dropdownSwitchButton;
+
+        [FindsBy(How = How.Id, Using = "top-cart-btn-checkout")]
+        internal IWebElement _checkoutButton;
+
+        [FindsBy(How = How.CssSelector, Using = "a.action.showcart")]
+        internal IWebElement _cartButton;
+
         protected readonly IWebDriver _driver;
         public BasePage(IWebDriver driver)
         {
@@ -59,6 +71,50 @@ namespace sleeniumTest.Pages
             Actions actions = new Actions(_driver);
             actions.ScrollToElement(element);
             actions.Perform();
+        }
+
+        public string GetAlertMessage()
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
+
+            wait.Until((_) => _alertMessage.Text.StartsWith("You added "));
+
+            IWebElement alert = _alertMessage;
+
+            return alert.Text;
+        }
+
+        public int GetCartCounter()
+        {           
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(".counter.qty")));            
+            
+            var cart = _driver.FindElement(By.CssSelector(".action.showcart"));
+            
+            wait.Until(ExpectedConditions.ElementToBeClickable(cart));
+            
+            ScrollToElement(cart);
+            
+            var counterCart = cart.FindElement(By.CssSelector(".counter.qty"));
+            
+            string counterCartText = counterCart.FindElement(By.CssSelector(".counter-number")).Text;
+            
+            return int.Parse(counterCartText);
+        }
+        public CostumerPage ClickMyAccountButton()
+        {
+            _dropdownSwitchButton.Click();
+            WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            IWebElement dropdown = waitForButton.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("ul.header.links")));
+            IWebElement myAccountButton = dropdown.FindElement(By.LinkText("My Account"));
+            myAccountButton.Click();
+            return new CostumerPage(_driver);
+        }
+
+        public void ClickCartButton()
+        {
+            ScrollToElement(_cartButton);
+            _cartButton.Click();
         }
     }
 }

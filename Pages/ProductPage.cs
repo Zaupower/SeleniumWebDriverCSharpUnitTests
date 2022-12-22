@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
+using SeleniumExtras.WaitHelpers;
 using sleeniumTest.Helper;
 using sleeniumTest.Models;
 using System;
@@ -17,8 +18,7 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "product-item-info")]
         private IList<IWebElement> _productInfoElementCollection;
 
-        [FindsBy(How = How.ClassName, Using = "messages")]
-        private IWebElement _alertMessage;
+        
 
         [FindsBy(How = How.LinkText, Using = "Bags")]
         private IWebElement _subCategoryBags;
@@ -90,16 +90,7 @@ namespace sleeniumTest.Pages
             return prices;
         }
 
-        public string GetAlertMessage()
-        {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
-
-            wait.Until((_) => _alertMessage.Text.StartsWith("You added "));
-
-            IWebElement alert = _alertMessage;
-
-            return alert.Text;
-        }
+        
 
         public void ScrollToProducts()
         {
@@ -122,14 +113,21 @@ namespace sleeniumTest.Pages
 
         public void AddProductsToCartByNumber(int numberOfProductsToAdd)
         {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
+            wait.Until(ExpectedConditions.ElementExists(By.ClassName("product-item-info")));
+
+
             for (int i = 0; i < numberOfProductsToAdd; i++){
                 IWebElement targetProduct = _productInfoElementCollection[i];
 
-                ScrollToElement(targetProduct);
+                Actions actions = new Actions(_driver);
+                actions.MoveToElement(targetProduct);
+                actions.Perform();
 
                 IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
 
                 productAddToCartButton.Click();
+                GetAlertMessage();
             }
            
         }
@@ -138,11 +136,13 @@ namespace sleeniumTest.Pages
         {
             IWebElement targetProduct = _productInfoElementCollection[index];
 
-            ScrollToElement(targetProduct);
+            Actions actions = new Actions(_driver);
+            actions.MoveToElement(targetProduct);
+            actions.Perform();
 
             targetProduct.Click();
 
-            return new SingleProductPage(_driver)
+            return new SingleProductPage(_driver);
         }
         public IEnumerable<string> GetProductInfoNames()
         {
@@ -153,7 +153,6 @@ namespace sleeniumTest.Pages
             return actual;
         }
 
-        //No futuro returna, SingleProductPage
         public void ClickSubcategoryBags()
         {
             _subCategoryBags.Click();

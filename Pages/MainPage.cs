@@ -18,20 +18,13 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.LinkText, Using = "Create an Account")]
         private IWebElement _createAnAccount;
         
-        [FindsBy(How = How.Id, Using = "top-cart-btn-checkout")]
-        private IWebElement _checkoutButton;
-
-        [FindsBy(How = How.CssSelector, Using = "a.action.showcart")]
-        private IWebElement _cartButton;
-        
         [FindsBy(How = How.Id, Using = "ui-id-1")]
         private IWebElement _cartBlock;
 
         [FindsBy(How = How.ClassName, Using = "messages")]
         private IWebElement _alertMessage;
 
-        [FindsBy(How = How.CssSelector, Using = "button.action.switch")]
-        private IWebElement _dropdownSwitchButton;
+        
 
         public MainPage(IWebDriver driver) : base(driver)
         {
@@ -70,18 +63,10 @@ namespace sleeniumTest.Pages
             waitForButton.Until(ExpectedConditions.ElementToBeClickable(_checkoutButton)).Click();
             
             return new CheckoutPage(_driver);
-
         }
-        public void ClickCartButton()
-        {
-            ScrollToElement(_cartButton);
-            _cartButton.Click();
-
-        }
-
+        
         public void ClickCheckoutButton()
-        {
-           
+        {           
             _checkoutButton.Click();
         }
 
@@ -94,19 +79,6 @@ namespace sleeniumTest.Pages
             IWebElement alert = _alertMessage;
 
             return alert.Text;
-        }
-
-        internal CostumerPage ClickMyAccountButton()
-        {
-
-            _dropdownSwitchButton.Click();
-            WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            IWebElement dropdown = waitForButton.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("ul.header.links")));
-            IWebElement myAccountButton = dropdown.FindElement(By.LinkText("My Account"));
-            myAccountButton.Click();
-            //Get element my acc
-
-            return new CostumerPage(_driver);
         }
     }
 }

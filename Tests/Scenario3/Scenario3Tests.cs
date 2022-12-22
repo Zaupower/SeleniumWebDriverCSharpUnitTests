@@ -26,7 +26,7 @@ namespace sleeniumTest.Tests.Scenario3
             //_driver = new ChromeDriver(chromeOptions);
             _driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
-            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);//Used to retry get elements in cases where the page/objet
+            _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(7);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined
             _driver.Navigate().GoToUrl("https://magento.softwaretestingboard.com/men.html");
             _mainPage = new MainPage(_driver);
@@ -53,15 +53,11 @@ namespace sleeniumTest.Tests.Scenario3
             ProductPage productPage = _mainPage.OpenGearNavigationButton();
             productPage.ClickSubcategoryBags();
             productPage.AddProductsToCartByNumber(2);
-            //expectedTotalPrice = productPage.AddProductsToCart(productList);
+                SingleProductPage singleProduct = productPage.ClickOnProductByIndex(2);
+                singleProduct.ClickAddToCart();
 
-            // Press ‘Gear’ category button
-            // Open ‘Bags’ category
-            // Add first 2 products to cart using ‘Add to cart’ button
-            // Open third product
-            // Press ‘Add to cart’
-            //Check that cart icon has right number
-
+            int cartCounter = _mainPage.GetCartCounter();
+            Console.WriteLine("Cart Counter: "+cartCounter);
 
         }
         [TearDown]

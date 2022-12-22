@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
 using SeleniumExtras.WaitHelpers;
+using sleeniumTest.Helper;
 using sleeniumTest.Models;
 using System;
 using System.Collections.Generic;
@@ -190,7 +191,7 @@ namespace sleeniumTest.Pages
             _telephoneInput.SendKeys(telephoneNumber);
         }
 
-        public string AddShippingMethod()
+        public decimal AddShippingMethod()
         {
             WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
 
@@ -208,7 +209,8 @@ namespace sleeniumTest.Pages
             }
             var selectShippimentButton = shipsMethods.First().FindElement(By.CssSelector(".col.col-method"));
             selectShippimentButton.Click();
-            return firstShipMethodPrice;
+
+            return Parser.CurrencyStringToDecimal(firstShipMethodPrice);
         }
 
         internal void ClickContinueShopping()

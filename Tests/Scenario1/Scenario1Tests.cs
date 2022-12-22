@@ -24,9 +24,9 @@ namespace sleeniumTest.Tests.Scenario1
         public void Setup()
         {
             var chromeOptions = new ChromeOptions();
-            //chromeOptions.AddArgument("headless");
-            //_driver = new ChromeDriver(chromeOptions);
-            _driver = new ChromeDriver();
+            chromeOptions.AddArgument("headless");
+            _driver = new ChromeDriver(chromeOptions);
+            //_driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined
@@ -46,6 +46,7 @@ namespace sleeniumTest.Tests.Scenario1
         [Test]
         public void test1_NewUser()
         {
+            OrderDetails expectedOrder = new OrderDetails();
             Product dashDigitalWatch = new Product{ ProductName = "Dash Digital Watch"};
             Product clamberlWatch = new Product{ProductName = "Clamber Watch"};
             List<Product> productList = new List<Product>();
@@ -54,44 +55,35 @@ namespace sleeniumTest.Tests.Scenario1
 
             List<decimal> expectedTotalPrice = new List<decimal>();
 
+            //Create account Page
             CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
-
             createAccountPage.CreateAnAccount(_userModel);
 
+            //Product Page
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
 
-            foreach(var product in productList)
-            {
-                string productPrice = productPage.AddProductToCart(product.ProductName);
-                expectedTotalPrice.Add(Parser.CurrencyStringToDecimal(productPrice));
-
-            }
-            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
+            expectedTotalPrice = productPage.AddProductsToCart(productList);
             
+            //Checkout Page
+            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();            
             checkoutPage.InputAddress(GenerateAddress.GetAddress());
-
-            string shippingPrice = checkoutPage.AddShippingMethod();
-            decimal shipping = Parser.CurrencyStringToDecimal(shippingPrice);
-
+            expectedOrder.ShippingAndHandling = checkoutPage.AddShippingMethod();
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
-
             string orderNumber = checkoutPage.GetOrderNumber();
-
             checkoutPage.ClickContinueShopping();
+
+            //Costumer Page
             CostumerPage costumerPage = _mainPage.ClickMyAccountButton();
             costumerPage.ClickMyOrders();
+
+            //Order Details Page
             OrderDetailsPage orderPage =  costumerPage.ClickOrder(orderNumber);
 
-
-            OrderDetails expectedOrder = new OrderDetails
-            {
-                 Products = productList,
-                 GrandTotal = expectedTotalPrice.Sum() + shipping,
-                 ShippingAndHandling = shipping,
-                 SubTotal = expectedTotalPrice.Sum(),
-
-            };
+            expectedOrder.GrandTotal = expectedTotalPrice.Sum() + expectedOrder.ShippingAndHandling;
+            expectedOrder.SubTotal = expectedTotalPrice.Sum();
+            expectedOrder.Products = productList;
+            
             OrderDetails actualOrder = orderPage.GetOrderDetails();
 
             var expectedJson = JsonConvert.SerializeObject(expectedOrder);
@@ -101,7 +93,7 @@ namespace sleeniumTest.Tests.Scenario1
 
         
 
-        [Test, Order(2)]
+        [Test]
         public void test1_AlreadyCreatedUser()
         {
             Product dashDigitalWatch = new Product { ProductName = "Dash Digital Watch" };
@@ -119,20 +111,14 @@ namespace sleeniumTest.Tests.Scenario1
             costumerLoginPage.LogIn(registeredUser.Email, registeredUser.Password);
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
-
-            foreach (var product in productList)
-            {
-                string productPrice = productPage.AddProductToCart(product.ProductName);
-                expectedTotalPrice.Add(Parser.CurrencyStringToDecimal(productPrice));
-
-            }
+            
+            expectedTotalPrice = productPage.AddProductsToCart(productList);
 
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
 
             checkoutPage.InputAddress(GenerateAddress.GetAddress());
 
-            string shippingPrice = checkoutPage.AddShippingMethod();
-            decimal shipping = Parser.CurrencyStringToDecimal(shippingPrice);
+            decimal shipping = checkoutPage.AddShippingMethod();
 
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();

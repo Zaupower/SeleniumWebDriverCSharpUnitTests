@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using NUnit.Framework.Constraints;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
 using sleeniumTest.Models;
@@ -28,6 +29,8 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "primary")]
         private IWebElement _submitNewUserButton;
 
+        [FindsBy(How = How.Id, Using = "email_address-error")]
+        private IWebElement _emailAddressError;
         public CreateAccountPage(IWebDriver driver) : base(driver)
         {
         }
@@ -44,6 +47,7 @@ namespace sleeniumTest.Pages
 
             return new CostumerPage(_driver);
         }
+
 
 
         public string GetCreateAccountTitle()
@@ -74,6 +78,13 @@ namespace sleeniumTest.Pages
         public void ClickSubmitNewUserButton()
         {
             _submitNewUserButton.Click();
+        }
+
+        public string GetEmailAddressError()
+        {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
+            wait.Until((_) => _emailAddressError.Text.StartsWith("This is"));
+            return _emailAddressError.Text;
         }
 
     }

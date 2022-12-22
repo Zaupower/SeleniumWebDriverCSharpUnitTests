@@ -2,6 +2,8 @@
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
+using sleeniumTest.Helper;
+using sleeniumTest.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +42,7 @@ namespace sleeniumTest.Pages
             return element;
         }
 
-        public string AddProductToCart(string product)
+        public decimal AddProductToCart(string product)
         {
             IWebElement targetProduct = GetProductInfo(product);
 
@@ -56,7 +58,33 @@ namespace sleeniumTest.Pages
 
             //wait untill cart proccess finish
             GetAlertMessage();
-            return itemPrice;
+
+            return Parser.CurrencyStringToDecimal(itemPrice);
+        }
+
+        public List<decimal> AddProductsToCart(List<Product> products)
+        {
+            List<decimal> prices = new List<decimal>();
+            foreach (Product product in products)
+            {
+                IWebElement targetProduct = GetProductInfo(product.ProductName);
+
+                Actions actions = new Actions(_driver);
+                actions.MoveToElement(targetProduct);
+                actions.Perform();
+
+                IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
+
+                string itemPrice = targetProduct.FindElement(By.ClassName("price")).Text;
+
+                productAddToCartButton.Click();
+                prices.Add(Parser.CurrencyStringToDecimal(itemPrice));
+                //wait untill cart proccess finish
+                GetAlertMessage();
+            }
+
+
+            return prices;
         }
 
         public string GetAlertMessage()

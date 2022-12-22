@@ -44,7 +44,7 @@ namespace sleeniumTest.Pages
         private IWebElement _newAddressButton;
 
         [FindsBy(How = How.ClassName, Using = "table-checkout-shipping-method")]
-        private IList<IWebElement> _chechoutShippingMethod;
+        private IWebElement _chechoutShippingMethod;
 
         [FindsBy(How = How.ClassName, Using = "actions-toolbar")]
         private IList<IWebElement> _actionToolBar;
@@ -113,6 +113,11 @@ namespace sleeniumTest.Pages
                 InputTelephone(address.TelephoneNumeber);
                 //Close addr page
                 _saveAddress.Click();
+
+                waitShipping.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("modal-popup")));
+                waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
+                waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.Id("checkoutSteps")));
+
             }
 
 
@@ -185,21 +190,38 @@ namespace sleeniumTest.Pages
             _telephoneInput.SendKeys(telephoneNumber);
         }
 
-        internal string AddShippingMethod()
+        public string AddShippingMethod()
         {
-            WebDriverWait waitShipping = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
-            waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.Id("checkout-shipping-method-load")));
+            
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("checkout-shipping-method-load")));
 
-            //WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
-            //wait.Until((_) => _chechoutShippingMethod.Select(i => i.FindElements(_shippingMethod).Count() > 0));
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
 
+            var testShipsMEthdsHead = _driver.FindElement(By.ClassName("table-checkout-shipping-method"));
 
-            IEnumerable<IWebElement> checkoutMethods = _driver.FindElements(By.Id("checkout-shipping-method-load"));
-            var shipingSelected = checkoutMethods.First();
-            Console.WriteLine("Number of shipping methods" + checkoutMethods.Count());
-            string shippingPrice = shipingSelected.FindElement(By.ClassName("price")).Text;
-            //shipingSelected.FindElement(_shippingMethod).Click();
-            return shippingPrice;
+            ScrollToElement(testShipsMEthdsHead);
+
+            var shipdBody = testShipsMEthdsHead.FindElement(By.TagName("tbody"));
+
+            var shipsMethods = shipdBody.FindElements(By.TagName("tr"));
+
+            //wait.Until((shipsMethods) => shipsMethods.First().FindElement(By.CssSelector(".col.col-price")));
+
+            string firstShipMethodPrice = shipsMethods.First().FindElement(By.CssSelector(".col.col-price")).Text;
+
+            Console.WriteLine("firstShipMethodPrice: " + firstShipMethodPrice);
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.ClassName("table-checkout-shipping-method")));
+
+            testShipsMEthdsHead = _driver.FindElement(By.ClassName("table-checkout-shipping-method"));
+
+            ScrollToElement(testShipsMEthdsHead);
+
+            shipdBody = testShipsMEthdsHead.FindElement(By.TagName("tbody"));
+
+            shipsMethods = shipdBody.FindElements(By.TagName("tr"));
+            shipsMethods.First().FindElement(By.CssSelector(".col.col-method")).Click();
+            return firstShipMethodPrice;
         }
 
         internal void ClickContinueShopping()

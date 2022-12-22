@@ -60,6 +60,7 @@ namespace sleeniumTest.Tests.Scenario1
             createAccountPage.CreateAnAccount(_userModel);
 
             ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
+
             foreach(var product in productList)
             {
                 string productPrice = productPage.AddProductToCart(product.ProductName);
@@ -69,8 +70,10 @@ namespace sleeniumTest.Tests.Scenario1
             CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
             
             checkoutPage.InputAddress(GenerateAddress.GetAddress());
+
             string shippingPrice = checkoutPage.AddShippingMethod();
             decimal shipping = Parser.CurrencyStringToDecimal(shippingPrice);
+
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
 
@@ -95,7 +98,7 @@ namespace sleeniumTest.Tests.Scenario1
             var expectedJson = JsonConvert.SerializeObject(expectedOrder);
             var actualJson = JsonConvert.SerializeObject(actualOrder);
 
-            Assert.AreEqual(expectedJson, actualJson);
+            Assert.That(expectedJson, Is.EqualTo(actualJson));
         }
 
 
@@ -107,39 +110,69 @@ namespace sleeniumTest.Tests.Scenario1
             var actualJson = JsonConvert.SerializeObject(actual);
             Assert.AreEqual(expectedJson, actualJson);
         }
+
         [Test, Order(2)]
         public void test1_AlreadyCreatedUser()
         {
-            CustomerLoginPage customerLoginPage = _mainPage.ClickSignInButton();
-            customerLoginPage.LogIn(_userModel.Email, _userModel.Password);
-            ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
-            productPage.AddProductToCart("Dash Digital Watch");
-            var actual = productPage.GetAlertMessage();
-            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
-            Random rn = new Random();
+            Product dashDigitalWatch = new Product { ProductName = "Dash Digital Watch" };
+            Product clamberlWatch = new Product { ProductName = "Clamber Watch" };
+            List<Product> productList = new List<Product>();
+            productList.Add(dashDigitalWatch);
+            productList.Add(clamberlWatch);
 
-            AddressModel address = new AddressModel
+            List<decimal> expectedTotalPrice = new List<decimal>();
+
+            var costumerLoginPage = _mainPage.ClickSignInButton();
+            
+            costumerLoginPage.LogIn(_userModel.Email, _userModel.Password);
+
+            ProductPage productPage = _mainPage.OpenWatchesNavigationButton();
+
+            foreach (var product in productList)
             {
-                FirstName = "Marcelo",
-                LastName = "Carvalhgo",
-                StreetAddress = "Rua de Real",
-                City = "San Antonio",
-                Region = "57",
-                PostalCode = "12345-6789",
-                Country = "US",
-                TelephoneNumeber = rn.Next(90000, 999999).ToString(),
-            };
-            checkoutPage.InputAddress(address);
-            checkoutPage.AddShippingMethod();
+                string productPrice = productPage.AddProductToCart(product.ProductName);
+                expectedTotalPrice.Add(Parser.CurrencyStringToDecimal(productPrice));
+
+            }
+
+            CheckoutPage checkoutPage = _mainPage.ProccedToCheckout();
+
+            checkoutPage.InputAddress(GenerateAddress.GetAddress());
+
+            string shippingPrice = checkoutPage.AddShippingMethod();
+            decimal shipping = Parser.CurrencyStringToDecimal(shippingPrice);
+
             checkoutPage.ClickNextPage();
             checkoutPage.ClickSaveOrder();
-            Assert.AreEqual("You added Dash Digital Watch to your shopping cart.", actual);
+
+            string orderNumber = checkoutPage.GetOrderNumber();
+
+            checkoutPage.ClickContinueShopping();
+            CostumerPage costumerPage = _mainPage.ClickMyAccountButton();
+            costumerPage.ClickMyOrders();
+            OrderDetailsPage orderPage = costumerPage.ClickOrder(orderNumber);
+
+
+            OrderDetails expectedOrder = new OrderDetails
+            {
+                Products = productList,
+                GrandTotal = expectedTotalPrice.Sum() + shipping,
+                ShippingAndHandling = shipping,
+                SubTotal = expectedTotalPrice.Sum(),
+
+            };
+            OrderDetails actualOrder = orderPage.GetOrderDetails();
+
+            var expectedJson = JsonConvert.SerializeObject(expectedOrder);
+            var actualJson = JsonConvert.SerializeObject(actualOrder);
+
+            Assert.That(expectedJson, Is.EqualTo(actualJson));
         }
 
         [TearDown]
         public void TearDown()
         {
-            _driver.Quit();
+            //_driver.Quit();
         }
     }
 }

@@ -49,7 +49,8 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "actions-toolbar")]
         private IList<IWebElement> _actionToolBar;
 
-        private By _shippingMethod = By.CssSelector("td.col.col-method");
+        //MEXI AQUI
+        private By _shippingMethod = By.ClassName("radio");
 
         private By _newAddress = By.CssSelector("button.action.action-show-popup");
 
@@ -90,14 +91,12 @@ namespace sleeniumTest.Pages
                 InputPostCode(address.PostalCode);
                 InputCountry(address.Country);
                 InputTelephone(address.TelephoneNumeber);
-
-                //AddShippingMethod();
-                //_nextPage.Click();
             }
             else
             {
                 WebDriverWait waitButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
                 var openAddressButton = waitButton.Until(ExpectedConditions.ElementToBeClickable(_newAddress));
+                
                 openAddressButton.Click();
                 
                 //Wait for popup address to exist
@@ -114,9 +113,6 @@ namespace sleeniumTest.Pages
                 InputTelephone(address.TelephoneNumeber);
                 //Close addr page
                 _saveAddress.Click();
-                //wait for shipping methods
-                //AddShippingMethod();
-                //_nextPage.Click();
             }
 
 
@@ -191,14 +187,18 @@ namespace sleeniumTest.Pages
 
         internal string AddShippingMethod()
         {
-            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
-            wait.Until((_) => _chechoutShippingMethod.Select(i => i.FindElements(_shippingMethod).Count() > 0));
+            WebDriverWait waitShipping = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            waitShipping.Until(ExpectedConditions.ElementToBeClickable(By.Id("checkout-shipping-method-load")));
 
-            IEnumerable<IWebElement> checkoutMethods = _chechoutShippingMethod.Select(i => i);
+            //WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(3));
+            //wait.Until((_) => _chechoutShippingMethod.Select(i => i.FindElements(_shippingMethod).Count() > 0));
+
+
+            IEnumerable<IWebElement> checkoutMethods = _driver.FindElements(By.Id("checkout-shipping-method-load"));
             var shipingSelected = checkoutMethods.First();
-
+            Console.WriteLine("Number of shipping methods" + checkoutMethods.Count());
             string shippingPrice = shipingSelected.FindElement(By.ClassName("price")).Text;
-            shipingSelected.FindElement(_shippingMethod).Click();
+            //shipingSelected.FindElement(_shippingMethod).Click();
             return shippingPrice;
         }
 

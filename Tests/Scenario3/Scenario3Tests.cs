@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace sleeniumTest.Tests.Scenario3
 {
@@ -43,17 +44,30 @@ namespace sleeniumTest.Tests.Scenario3
         [Test]
         public void Test()
         {
-            CreateAccountPage createAccountPage = _mainPage.ClickCreateAnAccountButton();
+            // Open Main page
+            // Open Customer Login page
+            // Login by valid user(any user)
+            var costumerLoginPage = _mainPage.ClickSignInButton();
+            CreateUserModel registeredUser = GenerateRandomUser.GetRegisteredUser();
+            costumerLoginPage.LogIn(registeredUser.Email, registeredUser.Password);
+            ProductPage productPage = _mainPage.OpenGearNavigationButton();
+            productPage.ClickSubcategoryBags();
+            productPage.AddProductsToCartByNumber(2);
+            //expectedTotalPrice = productPage.AddProductsToCart(productList);
 
-            _userModel.Email = "";
-            createAccountPage.CreateAnAccount(_userModel);
-            string emailInputError = createAccountPage.GetEmailAddressError();
-            Assert.That(emailInputError.Equals("This is a required field."));
+            // Press ‘Gear’ category button
+            // Open ‘Bags’ category
+            // Add first 2 products to cart using ‘Add to cart’ button
+            // Open third product
+            // Press ‘Add to cart’
+            //Check that cart icon has right number
+
+
         }
         [TearDown]
         public void TearDown()
         {
-            _driver.Quit();
+            //_driver.Quit();
         }
     }
 }

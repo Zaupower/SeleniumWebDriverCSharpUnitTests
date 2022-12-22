@@ -20,6 +20,9 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "messages")]
         private IWebElement _alertMessage;
 
+        [FindsBy(How = How.LinkText, Using = "Bags")]
+        private IWebElement _subCategoryBags;
+
         private By _productInfoNames = By.ClassName("product-item-link");
 
         private By _toCartButton = By.ClassName("tocart");
@@ -116,6 +119,31 @@ namespace sleeniumTest.Pages
 
             productAddToCartButton.Click();
         }
+
+        public void AddProductsToCartByNumber(int numberOfProductsToAdd)
+        {
+            for (int i = 0; i < numberOfProductsToAdd; i++){
+                IWebElement targetProduct = _productInfoElementCollection[i];
+
+                ScrollToElement(targetProduct);
+
+                IWebElement productAddToCartButton = targetProduct.FindElement(_toCartButton);
+
+                productAddToCartButton.Click();
+            }
+           
+        }
+
+        public SingleProductPage ClickOnProductByIndex(int index)
+        {
+            IWebElement targetProduct = _productInfoElementCollection[index];
+
+            ScrollToElement(targetProduct);
+
+            targetProduct.Click();
+
+            return new SingleProductPage(_driver)
+        }
         public IEnumerable<string> GetProductInfoNames()
         {
             IEnumerable<IWebElement> productInfoNames = _productInfoElementCollection
@@ -123,6 +151,12 @@ namespace sleeniumTest.Pages
 
             IEnumerable<string> actual = productInfoNames.Select(i => i.Text);
             return actual;
+        }
+
+        //No futuro returna, SingleProductPage
+        public void ClickSubcategoryBags()
+        {
+            _subCategoryBags.Click();
         }
 
     }

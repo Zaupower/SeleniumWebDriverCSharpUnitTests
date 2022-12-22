@@ -22,9 +22,9 @@ namespace sleeniumTest.Tests.Scenario3
         public void Setup()
         {
             var chromeOptions = new ChromeOptions();
-            //chromeOptions.AddArgument("headless");
-            //_driver = new ChromeDriver(chromeOptions);
-            _driver = new ChromeDriver();
+            chromeOptions.AddArgument("headless");
+            _driver = new ChromeDriver(chromeOptions);
+            //_driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(7);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined
@@ -44,26 +44,23 @@ namespace sleeniumTest.Tests.Scenario3
         [Test]
         public void Test()
         {
-            // Open Main page
-            // Open Customer Login page
-            // Login by valid user(any user)
             var costumerLoginPage = _mainPage.ClickSignInButton();
             CreateUserModel registeredUser = GenerateRandomUser.GetRegisteredUser();
             costumerLoginPage.LogIn(registeredUser.Email, registeredUser.Password);
             ProductPage productPage = _mainPage.OpenGearNavigationButton();
             productPage.ClickSubcategoryBags();
             productPage.AddProductsToCartByNumber(2);
-                SingleProductPage singleProduct = productPage.ClickOnProductByIndex(2);
-                singleProduct.ClickAddToCart();
+            SingleProductPage singleProduct = productPage.ClickOnProductByIndex(2);
+            singleProduct.ClickAddToCart();
 
             int cartCounter = _mainPage.GetCartCounter();
             Console.WriteLine("Cart Counter: "+cartCounter);
-
+            Assert.That(cartCounter, Is.EqualTo(3));
         }
         [TearDown]
         public void TearDown()
         {
-            //_driver.Quit();
+           _driver.Quit();
         }
     }
 }

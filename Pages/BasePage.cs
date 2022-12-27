@@ -23,7 +23,7 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "messages")]
         private IWebElement _alertMessage;
 
-        [FindsBy(How = How.XPath, Using = "/html/body/div[2]/header/div[1]/div/ul/li[2]/span/button")]
+        [FindsBy(How = How.XPath, Using = ".//button[contains(@data-action, 'customer-menu-toggle')]")]
         private IWebElement _dropdownSwitchButton;
 
         [FindsBy(How = How.Id, Using = "top-cart-btn-checkout")]

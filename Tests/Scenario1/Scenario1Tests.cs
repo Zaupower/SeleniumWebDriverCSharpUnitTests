@@ -150,7 +150,7 @@ namespace sleeniumTest.Tests.Scenario1
         [TearDown]
         public void TearDown()
         {
-            //_driver.Quit();
+            _driver.Quit();
         }
     }
 }

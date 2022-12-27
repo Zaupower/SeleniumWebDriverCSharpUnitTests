@@ -21,9 +21,9 @@ namespace sleeniumTest.Tests.Scenario2
         public void Setup()
         {
             var chromeOptions = new ChromeOptions();
-            //chromeOptions.AddArgument("headless");
-            //_driver = new ChromeDriver(chromeOptions);
-            _driver = new ChromeDriver();
+            chromeOptions.AddArgument("headless");
+            _driver = new ChromeDriver(chromeOptions);
+            //_driver = new ChromeDriver();
             _driver.Manage().Window.Maximize();
             _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);//Used to retry get elements in cases where the page/objet
                                                                                //need time to load, it trys every 50ms until time defined

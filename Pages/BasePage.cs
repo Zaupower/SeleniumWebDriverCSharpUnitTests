@@ -23,7 +23,7 @@ namespace sleeniumTest.Pages
         [FindsBy(How = How.ClassName, Using = "messages")]
         private IWebElement _alertMessage;
 
-        [FindsBy(How = How.CssSelector, Using = "button.action.switch")]
+        [FindsBy(How = How.XPath, Using = "/html/body/div[2]/header/div[1]/div/ul/li[2]/span/button")]
         private IWebElement _dropdownSwitchButton;
 
         [FindsBy(How = How.Id, Using = "top-cart-btn-checkout")]
@@ -31,6 +31,8 @@ namespace sleeniumTest.Pages
 
         [FindsBy(How = How.CssSelector, Using = "a.action.showcart")]
         internal IWebElement _cartButton;
+
+        private By _welcomeMessageLocator = By.ClassName("logged-in");
 
         protected readonly IWebDriver _driver;
         public BasePage(IWebDriver driver)
@@ -103,8 +105,13 @@ namespace sleeniumTest.Pages
         }
         public CostumerPage ClickMyAccountButton()
         {
+            WebDriverWait wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(4));
+
+            wait.Until((driver) => driver.FindElement(_welcomeMessageLocator).Text.StartsWith("Welcome, "));
             _dropdownSwitchButton.Click();
+
             WebDriverWait waitForButton = new WebDriverWait(_driver, TimeSpan.FromSeconds(10));
+            
             IWebElement dropdown = waitForButton.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("ul.header.links")));
             IWebElement myAccountButton = dropdown.FindElement(By.LinkText("My Account"));
             myAccountButton.Click();

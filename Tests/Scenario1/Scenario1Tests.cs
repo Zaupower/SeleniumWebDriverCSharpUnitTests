@@ -82,10 +82,10 @@ namespace sleeniumTest.Tests.Scenario1
 
             expectedOrder.GrandTotal = expectedTotalPrice.Sum() + expectedOrder.ShippingAndHandling;
             expectedOrder.SubTotal = expectedTotalPrice.Sum();
-            expectedOrder.Products = productList;
+            expectedOrder.Products = productList.OrderBy(i => i.Price);
             
             OrderDetails actualOrder = orderPage.GetOrderDetails();
-
+            actualOrder.Products.OrderBy(i => i.Price);
             var expectedJson = JsonConvert.SerializeObject(expectedOrder);
             var actualJson = JsonConvert.SerializeObject(actualOrder);
             Assert.AreEqual(expectedJson, actualJson);
@@ -133,14 +133,15 @@ namespace sleeniumTest.Tests.Scenario1
 
             OrderDetails expectedOrder = new OrderDetails
             {
-                Products = productList,
+                Products = productList.OrderBy(i=> i.Price),
                 GrandTotal = expectedTotalPrice.Sum() + shipping,
                 ShippingAndHandling = shipping,
                 SubTotal = expectedTotalPrice.Sum(),
 
             };
-            OrderDetails actualOrder = orderPage.GetOrderDetails();
 
+            OrderDetails actualOrder = orderPage.GetOrderDetails();
+            actualOrder.Products.OrderBy(i => i.Price);
             var expectedJson = JsonConvert.SerializeObject(expectedOrder);
             var actualJson = JsonConvert.SerializeObject(actualOrder);
 
